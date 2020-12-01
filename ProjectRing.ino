@@ -14,10 +14,11 @@ MicroDS3231 rtc;
 
 #define ITEMS 4
 
-// Битмап с картинкой стрелочки (Если нужен)
 const uint8_t ptr_bmp[] PROGMEM = {
   0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,
 };
+
+uint8_t dataSettings[1]; // массив значений настроек
 
 void setup() {
   oled.init(OLED128x64, 500);
@@ -28,47 +29,43 @@ void setup() {
 void loop() {
   static int8_t pointer = 0;
 
- 
+
   enc.tick();
 
-  if (enc.isLeft() or enc.isFastL()) {             
-    pointer = constrain(pointer - 1, 0, ITEMS - 1); 
+  if (enc.isLeft() or enc.isFastL()) {
+    pointer = constrain(pointer - 1, 0, ITEMS - 1);
   }
-  
+
   if (enc.isRight() or enc.isFastR()) {
     pointer = constrain(pointer + 1, 0, ITEMS - 1);
   }
-  
+
   if (enc.isClick()) {
     switch (pointer) {
-      case 0: TimeSerial(); break;
-      case 1: break;
+      case 0: CurrentTime(); break;
+      case 1: TimeSerial(); break;
       case 2: break;
       case 3: break;
-      case 4: break;
-      case 5: break;
-      case 6: break;
-      case 7: break;
 
     }
   }
 
 
   oled.clear();
-  oled.home(); 
+  oled.home();
 
-  if (pointer < 8) {     
-    oled.print            
+  if (pointer < 8) {
+    oled.print
     (F(
        "  Текущее время:\n"
        "  Ручной режим:\n"
        "  Настройки:\n"
-       "  Parameter 3:\n"
+       "  Выключение дисплея и сигнала:\n"
      ));
   }
 
-  printPointer(pointer); 
-  oled.update();          
+  printPointer(pointer);
+  oled.update();
 }
 
 
@@ -76,11 +73,11 @@ void loop() {
 void printPointer(uint8_t pointer) {
   oled.setCursor(0, pointer);
   oled.print(">");
- 
+
 }
 
-
-void TimeSerial(void){
+// ==========================================ВЫВОД ВРЕМЕНИ В СЕРИАЛ====================================
+void TimeSerial(void) {
   oled.clear();
   oled.home();
   oled.print(F("Press OK to return"));
@@ -106,4 +103,19 @@ void printSerialTime() {
   Serial.print(rtc.getMonth());
   Serial.print("/");
   Serial.println(rtc.getYear());
+}
+
+//==========================================ВЫВОД ТЕКУЩЕГО ВРЕМЕНИ======================================
+void CurrentTime(void) {
+  oled.clear();
+  oled.home();
+  oled.print(F(
+          "Press OK to return\n"
+          "hello"
+          ));
+  oled.update();
+  while (1) {
+    enc.tick();
+    if (enc.isClick()) return;
+  }
 }
