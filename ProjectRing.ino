@@ -31,7 +31,6 @@ void loop() {
 
 
   enc.tick();
-
   if (enc.isLeft() or enc.isFastL()) {
     pointer = constrain(pointer - 1, 0, ITEMS - 1);
   }
@@ -114,17 +113,36 @@ void CurrentTime(void) {
     oled.clear();
     oled.home();
     oled.scale2X();
+    oled.print(" ");
     oled.print(rtc.getHours());
     oled.print(":");
     oled.print(rtc.getMinutes());
     oled.print(":");
-    oled.print(rtc.getSeconds());
-
+    oled.println(rtc.getSeconds());
+    
+    oled.scale1X();
+    PrintWeekDay();
+    //oled.println(rtc.getDay());
     if (MainSignal == 0){
         oled.print("Ожидание...\n");
+    }else{
+        oled.print("Звоню!\n");
     }
 
     oled.update();
-    oled.scale1x();
   }
+}
+
+void PrintWeekDay(){
+    switch(rtc.getDay()){
+        case 1: oled.println("Понедельник"); break;
+        case 2: oled.println("Вторник"); break;
+        case 3: oled.println("Среда"); break;
+        case 4: oled.println("Четверг"); break;
+        case 5: oled.println("Пятница"); break;
+        case 6: oled.println("Суббота"); break;
+        case 7: oled.println("Воскресенье"); break;
+
+    }
+
 }
