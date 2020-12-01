@@ -11,14 +11,14 @@ Encoder enc(CLK, DT, SW);
 #include <microDS3231.h>
 MicroDS3231 rtc;
 
-
 #define ITEMS 4
+
 
 const uint8_t ptr_bmp[] PROGMEM = {
   0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,
 };
-
 uint8_t dataSettings[1]; // массив значений настроек
+bool MainSignal = false;
 
 void setup() {
   oled.init(OLED128x64, 500);
@@ -107,15 +107,24 @@ void printSerialTime() {
 
 //==========================================ВЫВОД ТЕКУЩЕГО ВРЕМЕНИ======================================
 void CurrentTime(void) {
-  oled.clear();
-  oled.home();
-  oled.print(F(
-          "Press OK to return\n"
-          "hello"
-          ));
-  oled.update();
   while (1) {
     enc.tick();
     if (enc.isClick()) return;
+
+    oled.clear();
+    oled.home();
+    oled.scale2X();
+    oled.print(rtc.getHours());
+    oled.print(":");
+    oled.print(rtc.getMinutes());
+    oled.print(":");
+    oled.print(rtc.getSeconds());
+
+    if (MainSignal == 0){
+        oled.print("Ожидание...\n");
+    }
+
+    oled.update();
+    oled.scale1x();
   }
 }
