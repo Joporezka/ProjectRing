@@ -12,12 +12,15 @@ Encoder enc(CLK, DT, SW);
 MicroDS3231 rtc;
 
 #define ITEMS 4
+#define DURATION 4
 
 
 const uint8_t ptr_bmp[] PROGMEM = {
   0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,
 };
-uint8_t dataSettings[1]; // массив значений настроек
+uint8_t TimeSettings[]= {       // массив значений настроек
+        0800, 40, 10, 10, 10,
+};
 bool MainSignal = false;
 
 void setup() {
