@@ -3,8 +3,8 @@
 GyverOLED oled;
 
 #include <GyverEncoder.h>
-#define CLK 4
-#define DT 3
+#define CLK 3
+#define DT 4
 #define SW 2
 Encoder enc(CLK, DT, SW);
 
@@ -15,9 +15,7 @@ MicroDS3231 rtc;
 #define DURATION 4
 
 
-const uint8_t ptr_bmp[] PROGMEM = {
-  0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,
-};
+
 uint8_t TimeSettings[] = {      // массив значений настроек
   8, 00, 40, 10, 10, 20, 10, 10           //часы начала, минуты начала, продолжительность урока, n(5) перемен
 };
@@ -27,6 +25,8 @@ void setup() {
   oled.init(OLED128x64, 500);
   oled.setContrast(255);
   Serial.begin(9600);
+  attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
+  attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
 }
 
 void loop() {
@@ -37,7 +37,6 @@ void loop() {
   if (enc.isLeft()) {
     pointer = constrain(pointer - 1, 0, ITEMS - 1);
   }
-  enc.tick();
   if (enc.isRight()) {
     pointer = constrain(pointer + 1, 0, ITEMS - 1);
   }
@@ -81,6 +80,13 @@ void printPointer(uint8_t pointer) {
 void printActivePointer(uint8_t pointer) {
   oled.setCursor(0, pointer);
   oled.print(">!");
+}
+
+void isrCLK() {
+  enc.tick();  // отработка в прерывании
+}
+void isrDT() {
+  enc.tick();  // отработка в прерывании
 }
 
 // ==========================================ВЫВОД ВРЕМЕНИ В СЕРИАЛ====================================
@@ -196,7 +202,6 @@ void settings(void) {
 
 
     oled.update();
-    enc.tick();
     if (enc.isHolded()) return;
   }
 }
