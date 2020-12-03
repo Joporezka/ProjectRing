@@ -159,6 +159,8 @@ void PrintWeekDay() {
 void settings(void) {
   while (1) {
     static uint8_t pointerSettings = 0;
+    static bool flag = 0;
+    
     oled.clear();
     oled.home();
     oled.print
@@ -183,6 +185,12 @@ void settings(void) {
     }
     if (enc.isRight()) {
       pointerSettings = constrain(pointerSettings + 1, 0, 7);
+    }
+    if (enc.isRightH()){
+      TimeSettings[pointerSettings]++;
+    }
+    if (enc.isLeftH()){
+      TimeSettings[pointerSettings]--;
     }
     printPointer(pointerSettings);
 
