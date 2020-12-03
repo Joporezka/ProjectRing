@@ -157,41 +157,38 @@ void PrintWeekDay() {
 
 //==============================МЕНЮ НАСТРОЕК===========================
 void settings(void) {
-  while(1){
-    
-  }
-  static uint8_t pointerSettings = 0;
-  oled.clear();
-  oled.home();
-  oled.print
-  (F(
-     "   Час начала: \n"
-     "   Мин. начала: \n"
-     "   Длительность: \n"
-     "   Перемена 1: \n"
-     "   Перемена 2: \n"
-     "   Перемена 3: \n"
-     "   Перемена 4: \n"
-     "   Перемена 5: \n"
-   ));
-  for (uint8_t i = 0; i < 8; i++) {
-    oled.setCursor(16, i);
-    oled.print(TimeSettings[i]);
-  }
-
-  enc.tick();
-  if (enc.isLeft()) {
-    pointerSettings = constrain(pointerSettings - 1, 0, 7);
-  }
-  if (enc.isRight()) {
-    pointerSettings = constrain(pointerSettings + 1, 0, 7);
-  }
-  printPointer(pointerSettings);
-  
-
-  oled.update();
   while (1) {
+    static uint8_t pointerSettings = 0;
+    oled.clear();
+    oled.home();
+    oled.print
+    (F(
+       "   Час начала: \n"
+       "   Мин. начала: \n"
+       "   Длительность: \n"
+       "   Перемена 1: \n"
+       "   Перемена 2: \n"
+       "   Перемена 3: \n"
+       "   Перемена 4: \n"
+       "   Перемена 5: \n"
+     ));
+    for (uint8_t i = 0; i < 8; i++) {
+      oled.setCursor(16, i);
+      oled.print(TimeSettings[i]);
+    }
+
     enc.tick();
-    if (enc.isClick()) return;
+    if (enc.isLeft()) {
+      pointerSettings = constrain(pointerSettings - 1, 0, 7);
+    }
+    if (enc.isRight()) {
+      pointerSettings = constrain(pointerSettings + 1, 0, 7);
+    }
+    printPointer(pointerSettings);
+
+
+    oled.update();
+    enc.tick();
+    if (enc.isHolded()) return;
   }
 }
