@@ -19,7 +19,7 @@ const uint8_t ptr_bmp[] PROGMEM = {
   0x3C, 0x3C, 0x3C, 0x3C, 0x3C, 0xFF, 0xFF, 0x7E, 0x3C, 0x18,
 };
 uint8_t TimeSettings[]= {       // массив значений настроек
-        0800, 40, 10, 10, 10,
+        8, 00, 40, 10, 10, 20, 10, 10           //часы начала, минуты начала, продолжительность урока, n(5) перемен
 };
 bool MainSignal = false;
 
@@ -46,7 +46,7 @@ void loop() {
     switch (pointer) {
       case 0: CurrentTime(); break;
       case 1: TimeSerial(); break;
-      case 2: break;
+      case 2: settings(); break;
       case 3: break;
 
     }
@@ -62,7 +62,7 @@ void loop() {
        "  Текущее время:\n"
        "  Ручной режим:\n"
        "  Настройки:\n"
-       "  Выключение дисплея и сигнала:\n"
+       "  Сон:\n"
      ));
   }
 
@@ -148,4 +148,18 @@ void PrintWeekDay(){
 
     }
 
+}
+
+void settings(void){
+    oled.clear();
+    oled.home();
+    oled.print
+    (F(
+            "   parameter 1: \n"
+            "   parameter 2: \n"
+            ));
+    oled.update();
+    while(1){
+        if (enc.isClick()) return;
+    }
 }
