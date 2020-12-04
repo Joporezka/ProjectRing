@@ -1,14 +1,14 @@
 /*
- * 
- * 
- * TO DO: убрать делэй на звонке(хуже этого нет ничего на этом свете)
- * 
- * 
- * 
- * 
- * 
- * 
- */
+
+
+   TO DO: убрать делэй на звонке(хуже этого нет ничего на этом свете)
+
+
+
+
+
+
+*/
 #define OLED_SOFT_BUFFER_64
 #include <GyverOLED.h>
 GyverOLED oled;
@@ -27,7 +27,7 @@ MicroDS3231 rtc;
 #define DURATION 4
 
 
-uint16_t StartTime = 480;                 // Время начала в минутах
+uint32_t StartTime = 480;                 // Время начала в минутах
 uint8_t TimeSettings[] = {                // массив значений настроек
   40, 10, 10, 20, 10, 10           //продолжительность Урока + перемен
 };
@@ -233,19 +233,23 @@ void settings(void) {
     if (enc.isHolded()) {
       return;
     }
-    
+
   }
 }
 
-uint16_t Time2Minutes(uint16_t hours, uint16_t minutes) {
-  return hours * 60 + minutes;
+uint32_t Time2Seconds(uint32_t hours, uint32_t minutes, uint32_t seconds) {
+  return seconds + minutes * 60 + hours * 3600;
 }
 
-uint16_t GlobalMinutes2Minutes(uint16_t minutes) {
+uint32_t GlobalSeconds2Minutes(uint32_t seconds) {
+  return seconds % 3600;
+}
+
+uint32_t GlobalSeconds2Seconds(uint32_t minutes) {
   return minutes % 60;
 }
 
-uint16_t GlobalMinutes2Hours(uint16_t minutes) {
+uint32_t GlobalMinutes2Hours(uint32_t seconds) {
   return minutes / 60;
 }
 
@@ -254,6 +258,6 @@ uint16_t GlobalMinutes2Hours(uint16_t minutes) {
 void Buzz() {
   Serial.println("BUZZ");
   digitalWrite(RELAY, HIGH);
-  delay(DURATION*1000);
+  delay(DURATION * 1000);
   digitalWrite(RELAY, LOW);
 }
