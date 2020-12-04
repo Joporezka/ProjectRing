@@ -1,8 +1,20 @@
+/*
+ * 
+ * 
+ * TO DO: убрать делэй на звонке(хуже этого нет ничего на этом свете)
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 #define OLED_SOFT_BUFFER_64
 #include <GyverOLED.h>
 GyverOLED oled;
 
 #include <GyverEncoder.h>
+#define RELAY 5
 #define CLK 2
 #define DT 3
 #define SW 4
@@ -22,6 +34,7 @@ uint8_t TimeSettings[] = {                // массив значений на�
 bool MainSignal = false;
 
 void setup() {
+  pinMode(RELAY, OUTPUT);
   oled.init(OLED128x64, 500);
   oled.setContrast(255);
   Serial.begin(9600);
@@ -166,7 +179,7 @@ void settings(void) {
   while (1) {
     static uint8_t pointerSettings = 0;
     static bool flag = 0;
-    
+
     oled.clear();
     oled.home();
     oled.print
@@ -181,14 +194,14 @@ void settings(void) {
      ));
     for (uint8_t i = 0; i <= 6; i++) {
       oled.setCursor(16, i);
-      if(i==0){
+      if (i == 0) {
         oled.print(GlobalMinutes2Hours(StartTime));
         oled.print(":");
         oled.print(GlobalMinutes2Minutes(StartTime));
-      }else{
-        oled.print(TimeSettings[i-1]);
+      } else {
+        oled.print(TimeSettings[i - 1]);
       }
-      
+
     }
 
     enc.tick();
@@ -198,39 +211,49 @@ void settings(void) {
     if (enc.isRight()) {
       pointerSettings = constrain(pointerSettings + 1, 0, 6);
     }
-    
-    if (enc.isRightH()){
-      if (pointerSettings == 0){
+
+    if (enc.isRightH()) {
+      if (pointerSettings == 0) {
         StartTime++;
-      }else{
-        TimeSettings[pointerSettings-1]++;
+      } else {
+        TimeSettings[pointerSettings - 1]++;
       }
     }
-    if (enc.isLeftH()){
-      if (pointerSettings == 0){
+    if (enc.isLeftH()) {
+      if (pointerSettings == 0) {
         StartTime--;
-      }else{
-        TimeSettings[pointerSettings-1]--;
+      } else {
+        TimeSettings[pointerSettings - 1]--;
       }
     }
     printPointer(pointerSettings);
 
 
     oled.update();
-    if (enc.isHolded()){
+    if (enc.isHolded()) {
       return;
     }
+    
   }
 }
 
-uint16_t Time2Minutes(uint16_t hours, uint16_t minutes){
-  return hours*60+minutes;
+uint16_t Time2Minutes(uint16_t hours, uint16_t minutes) {
+  return hours * 60 + minutes;
 }
 
-uint16_t GlobalMinutes2Minutes(uint16_t minutes){
-  return minutes%60;
+uint16_t GlobalMinutes2Minutes(uint16_t minutes) {
+  return minutes % 60;
 }
 
-uint16_t GlobalMinutes2Hours(uint16_t minutes){
-  return minutes/60;  
+uint16_t GlobalMinutes2Hours(uint16_t minutes) {
+  return minutes / 60;
+}
+
+//=======================ФУНКЦИЯ ЗВОНКА==================================
+
+void Buzz() {
+  Serial.println("BUZZ");
+  digitalWrite(RELAY, HIGH);
+  delay(DURATION*1000);
+  digitalWrite(RELAY, LOW);
 }
