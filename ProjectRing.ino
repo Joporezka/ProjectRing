@@ -3,10 +3,10 @@
 GyverOLED oled;
 
 #include <GyverEncoder.h>
-#define CLK 3
-#define DT 4
-#define SW 2
-Encoder enc(CLK, DT, SW);
+#define CLK 2
+#define DT 3
+#define SW 4
+Encoder enc(CLK, DT, SW, TYPE2);
 
 #include <microDS3231.h>
 MicroDS3231 rtc;
@@ -15,9 +15,9 @@ MicroDS3231 rtc;
 #define DURATION 4
 
 
-
-uint8_t TimeSettings[] = {      // массив значений настроек
-  8, 00, 40, 10, 10, 20, 10, 10           //часы начала, минуты начала, продолжительность урока, n(5) перемен
+uint16_t StartTime = 480;                 // Время начала в минутах
+uint8_t TimeSettings[] = {                // массив значений настроек
+  40, 10, 10, 20, 10, 10           //продолжительность Урока + перемен
 };
 bool MainSignal = false;
 
@@ -171,8 +171,7 @@ void settings(void) {
     oled.home();
     oled.print
     (F(
-       "   Час начала: \n"
-       "   Мин. начала: \n"
+       "   Начало: \n"
        "   Длительность: \n"
        "   Перемена 1: \n"
        "   Перемена 2: \n"
@@ -180,28 +179,58 @@ void settings(void) {
        "   Перемена 4: \n"
        "   Перемена 5: \n"
      ));
-    for (uint8_t i = 0; i < 8; i++) {
+    for (uint8_t i = 0; i <= 6; i++) {
       oled.setCursor(16, i);
-      oled.print(TimeSettings[i]);
+      if(i==0){
+        oled.print(GlobalMinutes2Hours(StartTime));
+        oled.print(":");
+        oled.print(GlobalMinutes2Minutes(StartTime));
+      }else{
+        oled.print(TimeSettings[i-1]);
+      }
+      
     }
 
     enc.tick();
     if (enc.isLeft()) {
-      pointerSettings = constrain(pointerSettings - 1, 0, 7);
+      pointerSettings = constrain(pointerSettings - 1, 0, 6);
     }
     if (enc.isRight()) {
-      pointerSettings = constrain(pointerSettings + 1, 0, 7);
+      pointerSettings = constrain(pointerSettings + 1, 0, 6);
     }
+    
     if (enc.isRightH()){
-      TimeSettings[pointerSettings]++;
+      if (pointerSettings == 0){
+        StartTime++;
+      }else{
+        TimeSettings[pointerSettings-1]++;
+      }
     }
     if (enc.isLeftH()){
-      TimeSettings[pointerSettings]--;
+      if (pointerSettings == 0){
+        StartTime--;
+      }else{
+        TimeSettings[pointerSettings-1]--;
+      }
     }
     printPointer(pointerSettings);
 
 
     oled.update();
-    if (enc.isHolded()) return;
+    if (enc.isHolded()){
+      return;
+    }
   }
+}
+
+uint16_t Time2Minutes(uint16_t hours, uint16_t minutes){
+  return hours*60+minutes;
+}
+
+uint16_t GlobalMinutes2Minutes(uint16_t minutes){
+  return minutes%60;
+}
+
+uint16_t GlobalMinutes2Hours(uint16_t minutes){
+  return minutes/60;  
 }
