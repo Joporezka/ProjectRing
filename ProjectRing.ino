@@ -2,12 +2,11 @@
 
 
    TO DO: убрать делэй на звонке(хуже этого нет ничего на этом свете)
-
-
-
-
-
-
+          добавить EEPROM
+   Pinout:
+   S1 S2 KEY 3 2 4
+   SCL SDA 5 4
+   RELAY 5 
 */
 #define OLED_SOFT_BUFFER_64
 #include <GyverOLED.h>
@@ -320,12 +319,12 @@ void Signal() {
 
 }
 //=========================СКРИНСЕЙВЕР===================
-void saver(){
+void saver() {
   oled.clear();
   oled.update();
-  while(1){
+  while (1) {
     enc.tick();
-    if(enc.isHold()){
+    if (enc.isHold()) {
       return;
     }
   }
