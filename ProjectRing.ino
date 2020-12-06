@@ -25,21 +25,25 @@ MicroDS3231 rtc;
 
 #define ITEMS 4
 #define DURATION 4
+#include <GyverTimers.h>
 
 
-uint32_t StartTime = 480;                 // Время начала в минутах
+uint32_t StartTime = 480 * 60;                 // Время начала в минутах
 uint8_t TimeSettings[] = {                // массив значений настроек
   40, 10, 10, 20, 10, 10           //продолжительность Урока + перемен
 };
 bool MainSignal = false;
 
 void setup() {
-  pinMode(RELAY, OUTPUT);
   oled.init(OLED128x64, 500);
   oled.setContrast(255);
   Serial.begin(9600);
   attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
   attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
+
+  pinMode(RELAY, OUTPUT);
+  Timer2.setFrequencyFloat(0.25);
+  Timer2.enableISR(CHANNEL_A);
 }
 
 void loop() {
@@ -195,9 +199,9 @@ void settings(void) {
     for (uint8_t i = 0; i <= 6; i++) {
       oled.setCursor(16, i);
       if (i == 0) {
-        oled.print(GlobalMinutes2Hours(StartTime));
+        oled.print(GlobalSeconds2Hours(StartTime));
         oled.print(":");
-        oled.print(GlobalMinutes2Minutes(StartTime));
+        oled.print(GlobalSeconds2Minutes(StartTime));
       } else {
         oled.print(TimeSettings[i - 1]);
       }
@@ -214,14 +218,14 @@ void settings(void) {
 
     if (enc.isRightH()) {
       if (pointerSettings == 0) {
-        StartTime++;
+        StartTime+=60;
       } else {
         TimeSettings[pointerSettings - 1]++;
       }
     }
     if (enc.isLeftH()) {
       if (pointerSettings == 0) {
-        StartTime--;
+        StartTime-=60;
       } else {
         TimeSettings[pointerSettings - 1]--;
       }
@@ -242,22 +246,21 @@ uint32_t Time2Seconds(uint32_t hours, uint32_t minutes, uint32_t seconds) {
 }
 
 uint32_t GlobalSeconds2Minutes(uint32_t seconds) {
-  return seconds % 3600;
+  return (seconds / 60) % 60;
 }
 
-uint32_t GlobalSeconds2Seconds(uint32_t minutes) {
-  return minutes % 60;
+uint32_t GlobalSeconds2Seconds(uint32_t seconds) {
+  return seconds % 60;
 }
 
-uint32_t GlobalMinutes2Hours(uint32_t seconds) {
-  return minutes / 60;
+uint32_t GlobalSeconds2Hours(uint32_t seconds) {
+  return seconds / 3600;
 }
 
 //=======================ФУНКЦИЯ ЗВОНКА==================================
 
-void Buzz() {
-  Serial.println("BUZZ");
-  digitalWrite(RELAY, HIGH);
-  delay(DURATION * 1000);
-  digitalWrite(RELAY, LOW);
+ISR(TIMER2_A) {
+  // генерируем меандр 25 гц (в два раза меньше частоты), мигаем
+  digitalWrite(5, !digitalRead(5));
+  //Serial.println("timer2");
 }
