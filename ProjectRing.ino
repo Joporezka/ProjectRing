@@ -28,6 +28,7 @@ MicroDS3231 rtc;
 #include <GyverTimers.h>
 
 
+
 uint32_t StartTime = 480 * 60;                 // Время начала в минутах
 uint8_t TimeSettings[] = {                // массив значений настроек
   40, 10, 10, 20, 10, 10           //продолжительность Урока + перемен
@@ -57,7 +58,6 @@ void setup() {
   attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
   attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
 
-  pinMode(SWITCH, INPUT);
   pinMode(RELAY, OUTPUT);
   /* ПОКАЗ ВРЕМЕНИ ЗВОНКОВ
     for(uint8_t i=0;i<=11;i++){
@@ -86,7 +86,7 @@ void loop() {
       case 0: CurrentTime(); break;
       case 1: TimeSerial(); break;
       case 2: settings(); break;
-      case 3: break;
+      case 3: saver(); break;
 
     }
   }
@@ -104,6 +104,7 @@ void loop() {
        "  Сон:\n"
      ));
   }
+
 
   printPointer(pointer);
   oled.update();
@@ -309,7 +310,7 @@ void Signal() {
     Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[9] or
     Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[10] or
     Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[11] or
-    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[12] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[12]
     //or enc.isHold()
   ) {
     digitalWrite(RELAY, HIGH);
@@ -317,4 +318,15 @@ void Signal() {
     digitalWrite(RELAY, LOW);
   }
 
+}
+//=========================СКРИНСЕЙВЕР===================
+void saver(){
+  oled.clear();
+  oled.update();
+  while(1){
+    enc.tick();
+    if(enc.isHold()){
+      return;
+    }
+  }
 }
