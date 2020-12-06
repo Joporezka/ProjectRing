@@ -3,10 +3,13 @@
 
    TO DO: убрать делэй на звонке(хуже этого нет ничего на этом свете)
           добавить EEPROM
+
+  
+
    Pinout:
    S1 S2 KEY 3 2 4
    SCL SDA 5 4
-   RELAY 5 
+   RELAY 5
 */
 #define OLED_SOFT_BUFFER_64
 #include <GyverOLED.h>
@@ -51,6 +54,7 @@ uint32_t timings[] =
 
 
 void setup() {
+  //rtc.setTime(COMPILE_TIME);
   oled.init(OLED128x64, 500);
   oled.setContrast(255);
   Serial.begin(9600);
@@ -133,10 +137,11 @@ void isrDT() {
 void TimeSerial(void) {
   oled.clear();
   oled.home();
-  oled.print(F("Press OK to return"));
+  oled.print(F("RTC SETTINGS SERIAL:"));
   oled.update();
   while (1) {
     enc.tick();
+    
     printSerialTime();
     if (enc.isClick()) return;
   }
@@ -219,7 +224,7 @@ void settings(void) {
     oled.print
     (F(
        "   Начало: \n"
-       "   Длительность: \n"
+       "   Длительн.: \n"
        "   Перемена 1: \n"
        "   Перемена 2: \n"
        "   Перемена 3: \n"
@@ -227,7 +232,7 @@ void settings(void) {
        "   Перемена 5: \n"
      ));
     for (uint8_t i = 0; i <= 6; i++) {
-      oled.setCursor(16, i);
+      oled.setCursor(15, i);
       if (i == 0) {
         oled.print(GlobalSeconds2Hours(StartTime));
         oled.print(":");
