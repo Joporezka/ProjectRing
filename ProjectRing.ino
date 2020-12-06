@@ -14,7 +14,6 @@
 GyverOLED oled;
 
 #include <GyverEncoder.h>
-#define RELAY 5
 #define CLK 2
 #define DT 3
 #define SW 4
@@ -22,8 +21,9 @@ Encoder enc(CLK, DT, SW, TYPE2);
 
 #include <microDS3231.h>
 MicroDS3231 rtc;
-
 #define ITEMS 4
+
+#define RELAY 5
 #define DURATION 4
 #include <GyverTimers.h>
 
@@ -32,7 +32,23 @@ uint32_t StartTime = 480 * 60;                 // Время начала в м�
 uint8_t TimeSettings[] = {                // массив значений настроек
   40, 10, 10, 20, 10, 10           //продолжительность Урока + перемен
 };
-bool MainSignal = false;
+
+uint32_t timings[] =
+{
+  StartTime,
+  timings[0] + TimeSettings[0] * 60,
+  timings[1] + TimeSettings[1] * 60,
+  timings[2] + TimeSettings[0] * 60,
+  timings[3] + TimeSettings[2] * 60,
+  timings[4] + TimeSettings[0] * 60,
+  timings[5] + TimeSettings[3] * 60,
+  timings[6] + TimeSettings[0] * 60,
+  timings[7] + TimeSettings[4] * 60,
+  timings[8] + TimeSettings[0] * 60,
+  timings[9] + TimeSettings[5] * 60,
+  timings[10] + TimeSettings[0] * 60,
+};
+
 
 void setup() {
   oled.init(OLED128x64, 500);
@@ -41,12 +57,19 @@ void setup() {
   attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
   attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
 
+  pinMode(SWITCH, INPUT);
   pinMode(RELAY, OUTPUT);
-  Timer2.setFrequencyFloat(0.25);
-  Timer2.enableISR(CHANNEL_A);
+  /* ПОКАЗ ВРЕМЕНИ ЗВОНКОВ
+    for(uint8_t i=0;i<=11;i++){
+    Serial.print(GlobalSeconds2Hours(timings[i]));
+    Serial.print(" ");
+    Serial.println(GlobalSeconds2Minutes(timings[i]));
+    }
+  */
 }
 
 void loop() {
+  Signal();
   static int8_t pointer = 0;
 
 
@@ -141,6 +164,8 @@ void CurrentTime(void) {
     enc.tick();
     if (enc.isClick()) return;
 
+    Signal();
+
     oled.clear();
     oled.home();
     oled.scale2X();
@@ -152,9 +177,14 @@ void CurrentTime(void) {
     oled.println(rtc.getSeconds());
 
     oled.scale1X();
+    oled.print(rtc.getDate());
+    oled.print(".");
+    oled.print(rtc.getMonth());
+    oled.print(".");
+    oled.println(rtc.getYear());
     PrintWeekDay();
     //oled.println(rtc.getDay());
-    if (MainSignal == 0) {
+    if (!digitalRead(RELAY)) {
       oled.print("Ожидание...\n");
     } else {
       oled.print("Звоню!\n");
@@ -218,14 +248,14 @@ void settings(void) {
 
     if (enc.isRightH()) {
       if (pointerSettings == 0) {
-        StartTime+=60;
+        StartTime += 60;
       } else {
         TimeSettings[pointerSettings - 1]++;
       }
     }
     if (enc.isLeftH()) {
       if (pointerSettings == 0) {
-        StartTime-=60;
+        StartTime -= 60;
       } else {
         TimeSettings[pointerSettings - 1]--;
       }
@@ -235,6 +265,12 @@ void settings(void) {
 
     oled.update();
     if (enc.isHolded()) {
+      //запись в массив времен звонка (в секундах)
+
+
+
+
+
       return;
     }
 
@@ -259,8 +295,26 @@ uint32_t GlobalSeconds2Hours(uint32_t seconds) {
 
 //=======================ФУНКЦИЯ ЗВОНКА==================================
 
-ISR(TIMER2_A) {
-  // генерируем меандр 25 гц (в два раза меньше частоты), мигаем
-  digitalWrite(5, !digitalRead(5));
-  //Serial.println("timer2");
+void Signal() {
+  if (
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[0] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[1] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[2] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[3] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[4] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[5] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[6] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[7] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[8] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[9] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[10] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[11] or
+    Time2Seconds(rtc.getHours(), rtc.getMinutes(), rtc.getSeconds()) == timings[12] or
+    //or enc.isHold()
+  ) {
+    digitalWrite(RELAY, HIGH);
+    delay(2000);
+    digitalWrite(RELAY, LOW);
+  }
+
 }
