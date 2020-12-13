@@ -1,0 +1,52 @@
+{
+  "uuid": "c7cb88374b3884aa051c7e744f188e12",
+  "path": "Offline/41234",
+  "name": "41234",
+  "content": "",
+  "created_at": "2020-12-14 00:32:43",
+  "updated_at": "2020-12-14 00:46:35",
+  "stick": "",
+  "documents": [
+    {
+      "uuid": "e6f9f730094f5948d6e8f6c3d6e34cfe",
+      "puuid": "c7cb88374b3884aa051c7e744f188e12",
+      "title": "NEW_PCB",
+      "filename": "NEW_PCB.json",
+      "description": "",
+      "docType": "3",
+      "master": "",
+      "thumb": "/images/thumb-default.png",
+      "components": {},
+      "BOM": [],
+      "updateTime": 1607884363,
+      "createTime": 1607884363,
+      "histories": [],
+      "created_at": "2020-12-14 00:32:43",
+      "updated_at": "2020-12-14 00:32:43"
+    },
+    {
+      "uuid": "f28874174f7a84a6cbfbeb8621bd5347",
+      "puuid": "c7cb88374b3884aa051c7e744f188e12",
+      "title": "Bell",
+      "filename": "Bell.json",
+      "description": "",
+      "docType": "3",
+      "master": "",
+      "thumb": "/images/thumb-default.png",
+      "components": {
+        "fef543f1a2cf45f190fd72fb4d17faf9": 1
+      },
+      "BOM": [],
+      "updateTime": 1607885195,
+      "createTime": 1607885195,
+      "histories": [],
+      "created_at": "2020-12-14 00:46:35",
+      "updated_at": "2020-12-14 00:46:35"
+    }
+  ],
+  "sort": [],
+  "title": "41234",
+  "foldername": "41234",
+  "schfilename": "41234.json",
+  "schfilemtime": 1607884363808.85
+}
